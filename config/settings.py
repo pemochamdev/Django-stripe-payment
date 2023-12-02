@@ -60,7 +60,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR , 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,3 +130,15 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+STRIPE_PUBLISHABLE_KEY="pk_test_51OIoKKCru7PseWbZr6MQuv4QW30nQIEbfTecq8rMfGXXI2XLqgeSA8VQnjQOBIMH71L50Jei9ZrJ2aHTmSvIhXmm00JWYgwGQx"
+STRIPE_SECRET_KEY="sk_test_51OIoKKCru7PseWbZ3JMIoDOrEFgkF3DcuVuD1vobtWB314Uv1Dt4XSi5srglkUZ35KRYILzW4Sbz2nNstuMbWZBS005seqrqum"
+
+
+
+# from decouple import config
+
+# # Stripe
+# STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
+# STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
