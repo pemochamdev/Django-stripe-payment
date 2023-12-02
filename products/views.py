@@ -1,10 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
+import stripe
+from django.conf import settings
 from django.views import View
 from django.views.generic import DetailView, ListView
 
 from .models import Price, Product
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class ProductListView(ListView):
     model = Product
@@ -20,3 +24,48 @@ class ProductDetailView(DetailView):
         context = super(ProductDetailView, self).get_context_data()
         context["prices"] = Price.objects.filter(product=self.get_object())
         return context
+
+
+
+class CreateStripeCheckoutSessionView(View):
+    """
+    Create a checkout session and redirect the user to Stripe's checkout page
+    """
+
+    def post(self, request, *args, **kwargs):
+        price = Price.objects.get(id=self.kwargs["pk"])
+
+        checkout_session = stripe.checkout.Session.create(
+            
+            payment_method_types=["card"],
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "usd",
+                        "unit_amount": int(price.price) * 100,
+                        "product_data": {
+                            "name": price.product.name,
+                            "description": price.product.desc,
+                            "images": [
+                                f"{settings.BACKEND_DOMAIN}/{price.product.thumbnail}"
+                            ],
+                        },
+                    },
+                    "quantity": price.product.quantity,
+                }
+            ],
+            metadata={"product_id": price.product.id},
+            mode="payment",
+            success_url=settings.PAYMENT_SUCCESS_URL,
+            cancel_url=settings.PAYMENT_CANCEL_URL,
+        )
+        return redirect(checkout_session.url)
+    
+
+from django.views.generic import TemplateView
+
+class SuccessView(TemplateView):
+    template_name = "products/success.html"
+
+class CancelView(TemplateView):
+    template_name = "products/cancel.html"

@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'stripe',
+
 
     # Local apps
     'products',
@@ -136,9 +138,13 @@ STRIPE_PUBLISHABLE_KEY="pk_test_51OIoKKCru7PseWbZr6MQuv4QW30nQIEbfTecq8rMfGXXI2X
 STRIPE_SECRET_KEY="sk_test_51OIoKKCru7PseWbZ3JMIoDOrEFgkF3DcuVuD1vobtWB314Uv1Dt4XSi5srglkUZ35KRYILzW4Sbz2nNstuMbWZBS005seqrqum"
 
 
-
-# from decouple import config
+from decouple import config
 
 # # Stripe
 # STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY')
 # STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
+
+
+BACKEND_DOMAIN = config("BACKEND_DOMAIN")
+PAYMENT_SUCCESS_URL = config("PAYMENT_SUCCESS_URL")
+PAYMENT_CANCEL_URL = config("PAYMENT_CANCEL_URL")
