@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 
-from .models import Price, Product
+from .models import Price, Product, PaymentHistory
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -114,7 +114,9 @@ class StripeWebhookView(View):
                 recipient_list=[customer_email],
                 from_email="pemochamdev@gmail.com",
             )
-
+            PaymentHistory.objects.create(
+                email=customer_email, product=product, payment_status="completed"
+            ) 
         # Can handle other events here.
 
         return HttpResponse(status=200)
