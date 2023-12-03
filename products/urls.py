@@ -6,7 +6,8 @@ from .views import (
     ProductListView,
     SuccessView,
     CancelView,
-    CreateStripeCheckoutSessionView
+    CreateStripeCheckoutSessionView,
+    StripeWebhookView,
 )
 
 
@@ -22,4 +23,6 @@ urlpatterns = [
     ),
     path("success/", SuccessView.as_view(), name="success"),
     path("cancel/", CancelView.as_view(), name="cancel"),
+    path("webhooks/stripe/", StripeWebhookView.as_view(), name="stripe-webhook"),
+
 ]

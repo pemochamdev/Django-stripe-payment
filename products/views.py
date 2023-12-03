@@ -1,9 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 import stripe
 from django.conf import settings
 from django.views import View
+from django.core.mail import send_mail # Add this
+from django.utils.decorators import method_decorator
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 
 from .models import Price, Product
@@ -67,5 +71,50 @@ from django.views.generic import TemplateView
 class SuccessView(TemplateView):
     template_name = "products/success.html"
 
+
 class CancelView(TemplateView):
     template_name = "products/cancel.html"
+
+
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class StripeWebhookView(View):
+    """
+    Stripe webhook view to handle checkout session completed event.
+    """
+
+    def post(self, request, format=None):
+        payload = request.body
+        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+        sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
+        event = None
+
+        try:
+            event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+        except ValueError as e:
+            # Invalid payload
+            return HttpResponse(status=400)
+        except stripe.error.SignatureVerificationError as e:
+            # Invalid signature
+            return HttpResponse(status=400)
+
+        if event["type"] == "checkout.session.completed":
+            print("Payment successful")
+
+            # Add this
+            session = event["data"]["object"]
+            customer_email = session["customer_details"]["email"]
+            product_id = session["metadata"]["product_id"]
+            product = get_object_or_404(Product, id=product_id)
+
+            send_mail(
+                subject="Here is your product",
+                message=f"Thanks for your purchase. The URL is: {product.url}",
+                recipient_list=[customer_email],
+                from_email="pemochamdev@gmail.com",
+            )
+
+        # Can handle other events here.
+
+        return HttpResponse(status=200)
