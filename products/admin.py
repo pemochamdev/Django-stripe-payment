@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Price, Product, ProductTag
+from .models import Price, Product, ProductTag, PaymentHistory
 
 class PriceAdmin(admin.StackedInline):
     model = Price
@@ -16,3 +16,4 @@ class ProductAdmin(admin.ModelAdmin):
 
 admin.site.register(ProductTag)
 admin.site.register(Price)
+admin.site.register(PaymentHistory)
